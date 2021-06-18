@@ -1,4 +1,6 @@
 ﻿using CommandLine;
+using Newtonsoft.Json;
+using SMU.Data;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -11,6 +13,12 @@ namespace SMU.Helpers
 {
     public static class AppGlobals
     {
+        private static readonly string ProfilesFolder = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData, Environment.SpecialFolderOption.Create),
+            "SMU",
+            "Profiles"
+        );
+
         public static Type[] GetCommandLineTypes()
         {
             return Assembly.GetExecutingAssembly().GetTypes().Where(t => t.GetCustomAttribute<VerbAttribute>() != null).ToArray();
@@ -37,6 +45,48 @@ namespace SMU.Helpers
             }
 
             return files;
+        }
+
+        public static bool CreateProfile(string name)
+        {
+            string profilePath = Path.Combine(ProfilesFolder, $"{name}.json");
+
+            if (!Directory.Exists(ProfilesFolder))
+            {
+                Directory.CreateDirectory(ProfilesFolder);
+            }
+
+            if (!File.Exists(profilePath))
+            {
+                Profile p = new Profile()
+                {
+                    Name = name
+                };
+
+                File.WriteAllText(profilePath, JsonConvert.SerializeObject(p, Formatting.Indented));
+                Console.WriteLine($"Created profile '{name}'.");
+                return true;
+            }
+
+            Console.WriteLine($"A profile named '{name}' already exists.");
+            return false;
+        }
+
+        public static List<Profile> GetProfiles()
+        {
+            List<Profile> profiles = new List<Profile>();
+
+            if (!Directory.Exists(ProfilesFolder))
+            {
+                Directory.CreateDirectory(ProfilesFolder);
+            }
+
+            foreach (string profilePath in Directory.GetFiles(ProfilesFolder))
+            {
+                profiles.Add(JsonConvert.DeserializeObject<Profile>(File.ReadAllText(profilePath)));
+            }
+
+            return profiles;
         }
     }
 }

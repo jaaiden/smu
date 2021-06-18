@@ -24,6 +24,6 @@ namespace SMU.Data
         /// <summary>
         /// The list of selected mods in the profile.
         /// </summary>
-        public List<Mod> Mods { get; set; }
+        public List<Mod> Mods { get; set; } = new List<Mod>();
     }
 }
