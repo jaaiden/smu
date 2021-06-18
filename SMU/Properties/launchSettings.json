@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "SMU": {
+      "commandName": "Project",
+      "commandLineArgs": "config awefbhuio"
+    }
+  }
+}
